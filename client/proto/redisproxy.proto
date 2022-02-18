@@ -1,0 +1,180 @@
+syntax = "proto2";
+
+package RedisProxy;
+
+enum EResultCode
+{
+	RESULT_DATA_NOTFOUND		= 1;		// 数据没找到
+    RESULT_SUCC                 = 0;		// 成功
+	RESULT_FAIL					= -1;		// 未知失败
+
+    // 客户端错误
+    RESULT_UNKNOWN_COMMAND      = -200;		// 未知命令
+	RESULT_UNKNOWN_VERSION		= -201;		// 未知版本
+
+    // 服务端错误
+    RESULT_SYSTEM_ERROR         = -300;		// 系统错误
+
+	// REDISERROR
+	RESULT_REDIS_IO_ERROR			= -101;		// redisIOerror
+	RESULT_REDIS_OTHER_ERROR		= -102;		// rediserroother
+	RESULT_REDIS_EOF_ERROR			= -103;		// rediserreof
+	RESULT_REDIS_PROTOCOL_ERROR		= -104;		// rediserrprotocol
+	RESULT_REDIS_OOM_ERROR			= -105;		// rediserroom
+	RESULT_REDIS_TIMEOUT_ERROR		= -106;		// rediserrtimeout
+    RESULT_REDIS_INTOUTOFRANGE_ERROR = -110;    // value is not an integer or out of range
+    RESULT_REDIS_MIGRATE_KEY_EXISTS = -121;     // busykey target key name already exists
+	RESULT_REDIS_UNKNOWN_ERROR		= -199;		// rediserrunknow
+}
+
+enum EGlobalCode 
+{
+	GLOBAL_SUCC					= 0;
+	GLOBAL_FAIL					= -1;
+	GLOBAL_INVALID_PARAM		= -2;		// 无效参数
+	GLOBAL_INVALID_USERPASSWD	= -3;		// 账号或密码无效
+	GLOBAL_INVALID_IP			= -4;		// 无效客户端IP
+	GLOBAL_QUOTAEXCEE			= -5;		// 超出流控阀值
+	GLOBAL_TOO_MANY_REQUESTS	= -6;		// 请求含有的body过多 TODO
+}
+
+// 业务调用类型
+enum ECallType
+{
+	CALLTYPE_NONE		= 0;	// 未知
+	CALLTYPE_SYNC		= 1;	// 同步调用
+	CALLTYPE_ASYNC		= 2;	// 异步调用
+}
+
+// 业务调用模式
+enum ECallMode
+{
+	CALLMODE_NONE		= 0;	
+	CALLMODE_SINGLE		= 1;	// 单个请求模式
+	CALLMODE_MUL		= 2;	// 使用批量模式
+	CALLMODE_PIPELINE	= 3;	// 使用pipeline模式
+}
+
+message RequestHead
+{
+	optional ECallMode nCallMode			= 1 [default = CALLMODE_SINGLE];	// 使用模式 ECallMode
+	optional ECallType nCallType			= 2 [default = CALLTYPE_SYNC];		// 参考ECallType
+}
+
+enum EVersion
+{
+	VERSION_NONE	= 0;
+	VERSION_KV		= 1;		// Key字端和value字端必填，cmd填写命令；例如key="field0", value="10", cmd="set"，仅支持get/set命令
+	VERSION_CMD		= 2;		// Key和Value字段不必填，cmd填写完整命令；例如cmd="set field0 10"
+
+	/* 仅需填写Element向量；setex key timeout value
+	   例如：oelementlist[0]{nchartype=CHARTYPE_STRING,srequestelement="setex"}
+	 oelementlist[1]{nchartype=CHARTYPE_STRING,srequestelement="key_123"}
+	 oelementlist[2]{nchartype=CHARTYPE_STRING,srequestelement="1000"}
+	 oelementlist[3]{nchartype=CHARTYPE_STRING,srequestelement="value_456"}
+	 */
+	VERSION_ELEMENTVECTOR = 3;		
+}
+
+// 请求Body中的字符类型
+enum ECharType
+{
+	CHARTYPE_NONE		= 0;
+	CHARTYPE_STRING		= 1;	// 表示字符串类型
+	CHARTYPE_BINARY		= 2;	// 表示二进制类型
+}
+
+enum ERequestElementType
+{
+	REQUESTELEMENTTYPE_NONE		= 0;
+	REQUESTELEMENTTYPE_CMD		= 1;
+	REQUESTELEMENTTYPE_KEY		= 2;
+	REQUESTELEMENTTYPE_VALUE	= 3;
+	REQUESTELEMENTTYPE_FILED	= 4;				// 用于HashMap数据结构 中设置Field
+	REQUESTELEMENTTYPE_TIMEOUT	= 5;				// 用于SetEx命令 中设置超时
+	REQUESTELEMENTTYPE_MEMBER	= 6;				// 用于有序集合中 Member
+	REQUESTELEMENTTYPE_EX		= 7;				// 用于Set命令的过期时间--秒
+	REQUESTELEMENTTYPE_PX		= 8;				// 用于Set命令的过期时间--毫秒
+	REQUESTELEMENTTYPE_NX		= 9;				// 用于Set命令，只在键不存在时，才对键进行设置操作
+	REQUESTELEMENTTYPE_XX		= 10;				// 用于Set命令，只在键存在时，才对键进行设置操作
+	REQUESTELEMENTTYPE_SCORE	= 11;				// 用于sortset时设置的member分数
+	REQUESTELEMENTTYPE_START	= 12;				// 用于有序集合range查询的start，ZRANGEBYSCORE查询的min
+	REQUESTELEMENTTYPE_STOP		= 13;				// 用于有序集合Range查询的stop，ZRANGEBYSCORE查询的max
+	REQUESTELEMENTTYPE_OFFSET	= 14;				// 用于有序集合ZRANGEBYSCORE查询的 limit offset count
+	REQUESTELEMENTTYPE_COUNT	= 15;				// 用于有序集合ZRANGEBYSCORE查询的 limit offset count
+	REQUESTELEMENTTYPE_CH		= 16;
+	REQUESTELEMENTTYPE_INCR		= 17;
+	REQUESTELEMENTTYPE_RANGE	= 18;				// 用于SortSet时设置zrange查找范围
+}
+
+// 定义请求数组的每个元素
+message RequestElement
+{
+	optional int32			nRequestElementType	= 1;		// ERequestElementType
+	optional int32			nCharType			= 2;		// ECharType
+	optional string			sRequestElement		= 3;		// 表示元素值
+}
+
+message RequestBody
+{
+	optional string sCmd						= 1;				// 命令字段，表示redis的命令
+	optional string sKey						= 2;				// 关键Key
+	optional string sValue						= 3;				// 记录Value，用于写入时才需要填
+	repeated RequestElement oRequestElementList	= 4;				// 以向量记录Cmd、Key、Value、Opt等字段
+	optional int32  nVer						= 5 [default = 1];	// 用于区分不同的版本, 参考EVersion
+}
+
+// 定义客户端请求的数据格式
+message RedisProxyRequest
+{
+	optional string sAppId					= 1;	// 申请账号ID
+	optional string sAppPw					= 2;	// 分配的密码
+	optional string sAppName				= 3;	// 应用名
+	optional string sTableName				= 4;	// 表名
+	optional RequestHead oRequestHead		= 5;	// 请求头部
+	repeated RequestBody oRequestBodyList	= 6;	// 请求的KeyList
+}
+
+// 定义返回的结果类型
+enum EResultType
+{
+	RESULTTYPE_NONE				= 0;	
+	RESULTTYPE_STRING			= 1;				// 返回字符串
+	RESULTTYPE_INTEGER			= 2;				// 返回整数
+	RESULTTYPE_ARRAY			= 3;				// 返回数组
+	RESULTTYPE_FLOAT			= 4;				// 返回浮点数
+}
+
+// 定义返回数组的每个元素
+message ResultElement
+{
+	optional int32	nRet			= 1;	// 表示请求返回码 参考EResultCode
+	optional int32	nResultType		= 2;	// 返回的类型 EResultType
+	optional string sResultElement	= 3;	// 返回结果值
+}
+
+// 定义服务单条请求的响应结构 
+message ResultBody
+{
+	optional int32	nRet						= 1;	// 表示请求返回码 参考EResultCode
+	optional string sValue						= 2;	// 表示返回来是String，对于Array的方式返回空
+	optional int32  nResultType					= 3;	// EResultType
+	repeated ResultElement oResultElementList	= 4;	// 表示返回来是Array(SortSet/Hash/List)
+	optional int32	nVer						= 5;	// 表示返回来的版本号，跟请求时的版本号一致 EVersion
+}
+
+// 定义服务端响应的响应结构
+message RedisProxyResponse
+{
+	repeated ResultBody oResultBodyList		= 1;		// 表示应答返回的结果，跟Request顺序一致
+	optional int32 nGret					= 2;		// 全局状态码 EGlobalCode
+}
+
+// 定义redisProxyService，对 Redis 操作的代理接口
+service RedisProxyService{
+	// 对 Redis 执行操作的代理函数，支持绝大多数命令
+	// 输入：RedisProxyRequest
+	// 输出：RedisProxyResponse
+	// 返回值：Status
+	rpc RedisProxyCmd( RedisProxyRequest ) returns( RedisProxyResponse );
+}

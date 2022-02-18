@@ -1,0 +1,271 @@
+syntax = "proto2";
+import "redisproxy.proto";
+package RedisProxyCommon;
+
+enum ERedisCmd
+{
+	REDIS_CMD_NONE			= 0;
+	REDIS_CMD_GET			= 100;
+	REDIS_CMD_SET			= 101;
+	REDIS_CMD_EXISTS		= 102;
+	REDIS_CMD_ZCOUNT		= 103;
+	REDIS_CMD_ZRANGEBYSCORE	= 104;
+	REDIS_CMD_EXPIRE		= 105;
+	REDIS_CMD_INCR			= 106;
+	REDIS_CMD_ZADD			= 107;
+	REDIS_CMD_ZREMRANGEBYSCORE	= 108;
+	REDIS_CMD_ZREMRANGEBYRANK	= 109;
+	REDIS_CMD_HGET			= 110;
+	REDIS_CMD_HMGET			= 111;
+	REDIS_CMD_HGETALL		= 112;
+	REDIS_CMD_HDEL			= 113;
+	REDIS_CMD_HSET			= 114;
+	REDIS_CMD_HMSET			= 115;
+	REDIS_CMD_HINCRBY		= 116;
+	REDIS_CMD_HINCRBYFLOAT	= 117;
+}
+
+// 分配业务侧的账号信息结构
+message AppInfo
+{
+	optional string sAppId					= 1;	// App名称
+	optional string sAppPw					= 2;	// App密码
+	optional string sRedisId				= 3;	// Redis账号名称
+	optional string sRedisPw				= 4;	// Redis密码
+	optional string sAppName				= 5;	// 应用名称
+	optional string sTableName				= 6;	// 表名
+	optional int64	nFlowControlMaxReq		= 7;	// 流控单位时间最大请求值
+	optional int64  nFlowControlIntervalMs	= 8;	// 流控间隔时间(毫秒)
+	optional string slmdbid					= 9;	// LMDB分配的账号ID
+	optional string slmdbpw					= 10;	// LMDB分配的密码
+	optional string sctime					= 11;	// 创建时间
+	optional string smtime					= 12;	// 修改时间
+}
+// 内部请求数据格式
+message InnerRequestBody
+{
+	optional string sCmd									= 1;					// 命令字段，表示redis的命令
+	optional string sKey									= 2;					// 关键Key
+	optional string sValue									= 3;					// 记录Value，用于写入时才需要填
+	optional string sSid									= 4;					// 每个命令的子ID
+	repeated RedisProxy.RequestElement oRequestElementList	= 5;					// 以向量记录Cmd、Key、Value、Opt等字段
+	optional int32  nVer									= 6 [default = 1];		// 用于区分不同的版本协议
+}
+
+message RedisProxyInnerRequest
+{
+	optional AppInfo	 oAppInfo						= 1;			// App信息
+	optional RedisProxy.RequestHead oRequestHead		= 2;			// 请求头部
+	optional string sMsgid								= 3;			// InnerRequest主ID
+	repeated InnerRequestBody	oInnerRequestBodyList	= 4;			// InnerRequestBodyList
+}
+
+message RedisProxyInnerResult
+{
+	optional int32	nRet									= 1;		// 单条响应结果的返回码
+	optional string sResult									= 2;		// 返回结果，后续再考虑其他类型，目前支持字符串类型
+	optional int32  nResultType								= 3;		// EResultType
+	repeated RedisProxy.ResultElement oResultElementList	= 4;		// 表示返回来是Array(SortSet/Hash/List)
+	optional int32	nVer									= 5;		// 表示返回来的版本号，跟请求时的版本号一致 EVersion
+}
+
+message RedisProxyInnerResponse
+{
+	optional string sMsgid										= 1;
+	// key=ssid(回话id，响应时跟请求顺序关联), value=RedisProxyInnerResult
+	map< string, RedisProxyInnerResult > mapRedisProxyInnerResult = 2; 
+}
+
+// PipeLine请求的数据格式
+message CmdBody
+{
+	optional string sCmd									= 1;					// 命令字段，表示redis的命令
+	optional string sKey									= 2;					// 关键Key
+	optional string sValue									= 3;					// 记录Value，用于写入时才需要填
+	optional string sSid									= 4;					// 每个命令的子ID，用途像sessionid
+	repeated RedisProxy.RequestElement oRequestElementList	= 5;					// 以向量记录Cmd、Key、Value、Opt等字段
+	optional int32  nVer									= 6 [default = 1];		// 版本号
+}
+
+message RedisAuthInfo
+{
+	optional string sRedisId				= 1;	// Redis账号名称
+	optional string sRedisPw				= 2;	// Redis密码
+	optional string sRedisProductName		= 3;	// 表名
+}
+
+message PipeLineRequest
+{
+	optional RedisAuthInfo	oRedisAuthInfo	= 1;	// Redis校验信息
+	optional string sMsgid					= 2;	// PipeLine主ID，用于标记主请求ID
+	repeated CmdBody oCmdBodyList			= 3;	// PipeLineCmdList
+}
+
+message PipeLineResult
+{
+	optional string sSid									= 1;
+	optional int32	nRet									= 2;
+	optional string sResult									= 3;
+	optional int32  nResultType								= 4;		// EResultType
+	repeated RedisProxy.ResultElement oResultElementList	= 5;		// 表示返回来是Array(SortSet/Hash/List)
+	optional int32	nVer									= 6;		// 表示返回来的版本号，跟请求时的版本号一致 EVersion
+}
+
+message PipeLineResponse
+{
+	optional string sMsgid						= 1;	// 主请求ID
+	repeated PipeLineResult oPipeLineResultList	= 2;	// 响应列表
+}
+
+enum EInstanceState
+{
+	INSTANCE_STATE_OK						= 0;	// 在线状态
+	INSTANCE_STATE_PFAIL					= 1;	// 疑似下线状态
+	INSTANCE_STATE_FAIL						= 2;	// 已下线状态
+}
+
+//节点信息，用于记录当前节点ip信息和状态信息
+message Instance
+{
+	optional int32	nInstanceId			= 1;		// 实例ID
+	optional string sIp					= 2;		// 实例IP
+	optional int32	nPort				= 3;		// 实例端口
+	optional int32	nInstanceState		= 4;		// EInstanceState
+	optional int32  nSlotNum			= 5;		// 节点所处理的槽数
+	optional string sctime				= 6;		// 节点创建时间
+	optional string slftime				= 7;		// 节点最近下线时间
+	optional string smtime				= 8;		// 节点更新时间
+	optional int32  nDataBase			= 9;		// 实例所用的库
+	optional int32  nVer				= 10;		// 版本编号
+}
+
+enum EAppTableRebalanceState
+{
+    APPTABLE_REBALANCE_STATE_NORMAL         = 0x00;
+    APPTABLE_REBALANCE_STATE_REBALANCING    = 0x01;     // 重均衡中
+}
+
+enum EGroupState
+{
+	GROUP_STATE_OK						= 0;	// 在线状态
+	GROUP_STATE_PFAIL					= 1;	// 疑似下线状态
+	GROUP_STATE_FAIL					= 2;	// 已下线状态
+}
+
+// 节点迁移状态
+enum EGroupMigrateState
+{
+	GROUP_MIGRATE_STATE_NORMAL                  = 0x00;
+	GROUP_MIGRATE_STATE_MIGRATING               = 0x01;		// 迁移状态
+    GROUP_MIGRATE_STATE_FINISH                  = 0x02;     // 完成迁移
+}
+
+// 分组信息
+message GroupInfo
+{
+	optional int32  nGroupId			= 1;		// 分组ID
+	optional string sAppTable			= 2;		// 产品名称
+	optional int32	nInstanceCnt		= 3;		// 实例个数
+	repeated Instance	oInstanceList	= 4;		// 实例列表
+	optional Instance	oMaster			= 5;		// 主实例
+	optional int32	nGroupState			= 6;		// 分组的状态
+}
+
+// Redis链接池配置信息
+message RedisConnectPoolConf
+{
+	optional int32 nMaxSize				= 1;			// 最大链接数
+	optional int32 nMinSize				= 2;			// 最小链接数
+	optional int32 nMinUsedCnt			= 3;			// 最少使用次数阀值
+	optional int64 nMaxIdleTime			= 4;			// 最大空闲时间
+	optional int32 nCreateSize			= 5;			// 创建链接数
+	optional int64 nKeepAliveTime		= 6;			// 心跳检测时间
+	optional bool  bIsKeepAliveRun		= 7;			// 是否打开心跳检测
+}
+
+// 应用表信息
+message AppTableInfo
+{
+	optional string sRedisApp							= 1;		// 应用名称
+	optional string sRedisTable							= 2;		// 表名称
+	optional string sRedisPasswd						= 3;		// 密码
+	optional int32  nRedisSlotCnt						= 4;		// 分配的槽数量
+	optional string sRedisStatus						= 5;		// 状态：configure；在线active；下线inactive
+	optional int32  nRedisConnectMaxTryTimes			= 6;		// 链接重试次数
+	optional int64  nRedisTimeoutSec					= 7;		// 超时秒时间
+	optional int64	nRedisTimeoutUSec					= 8;		// 超时微秒时间
+	optional RedisConnectPoolConf oRedisConnectPoolConf	= 9;		 
+}
+
+message SlotConf
+{
+	optional int32	nSlotCnt				= 1;
+	optional string sGroupSlot				= 2;
+}
+
+// slot迁移行动表是放到一个节点中，还是放到多个节点中？临时状态
+// 所以类似节点上下线一样，需要对slot状态进行管理，并且迁移计划表中内容会比较多
+enum ESlotState
+{
+	SLOT_STATE_NONE							= 0;
+	SLOT_STATE_NORMAL						= 1;		// 正常状态
+	SLOT_STATE_PENDING						= 2;		// 需要迁移出去的slot
+	SLOT_STATE_PREPARING					= 3;		// 暂没用到
+	SLOT_STATE_MIGRATING					= 4;		// 迁出中，不读不写
+	SLOT_STATE_IMPORTING					= 5;		// 导入中，不读不写
+	SLOT_STATE_FINISH						= 6;		// 迁移完成状态
+}
+
+// 迁移计划结构体
+message SlotAction
+{
+	optional int32	nSlotId					= 1;		// slotid
+	optional int32	nFromGId				= 2;		// 来源group
+	optional int32	nToGId					= 3;		// 目标group
+	optional int32	nState					= 4;		// 槽状态 ESlotState
+	optional int64	nCursor					= 5;		// 扫描游标
+	optional string sSTime					= 6;		// 开始时间
+	optional string sCTime					= 7;		// 修改时间
+}
+
+// 槽信信息
+message SlotInfo
+{
+	optional int32	nSlotId				= 1;	// slotId
+	optional int32  nSlotState			= 2;	// ESlotState
+	// redis-group 
+	optional int32  nGroupId			= 3;	// 节点组ID
+	optional int32	nVer				= 4;	// 版本编号
+}
+
+// group下线信息
+message FailOverInfo
+{
+	optional int32	nInstanceId			= 1;		// 实例ID
+	optional string sHost				= 2;		// 实例Host
+	optional int32  nGroupId			= 3;		// groupID
+	optional int32	nGroupState			= 4;		// 分组状态EGroupState
+	optional string sTopic				= 5;		// Kafka消息topic名称
+	optional int32	nPartition			= 6;		// Kafka消息分区号
+	optional string slftime				= 7;		// 下线时间
+    optional string sAppTable           = 8;        // 表名
+	optional int64	nOffset				= 9;		// 需要写入KafKa的消费位置
+}
+
+//redis集群信息，怎样定一个集群的概念？
+//跟AppTableInfo 实际同一个概念，考虑合并在一起？
+message ClusterInfo
+{
+	optional int32 nClusterState			= 1;	// EClusterState
+	repeated Instance oMigratingSlotTo		= 2;	// 迁移槽的目标实例
+	repeated Instance oMigratingSlotFrom	= 3;	// 迁移槽的来源实例
+	optional int32 nVer						= 4;	// 版本编号
+}
+
+enum EAppTableState
+{
+	APPTABLE_STATE_NONE					= 0;		// 
+	APPTABLE_STATE_ACTIVE				= 1;		// 活跃的表
+	APPTABLE_STATE_INACTIVE				= 2;		// 非活跃的表
+}
+

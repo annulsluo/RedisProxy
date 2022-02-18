@@ -1,0 +1,87 @@
+#-----------------------------------------------------------------------
+
+APP       := AIAD 
+TARGET    := RedisProxyServer 
+CXX	= g++
+MFLAGS    := 
+CFLAGS    := -c -std=c++11 -Wall -g -O3 -Wno-conversion-null -DBOOST_ALL_DYN_LINK -DBOOST_LOG_DYN_LINK
+DFLAGS    :=
+CONFIG    := 
+STRIP_FLAG:= N
+J2CXX_FLAG:= 
+TAGS_GROUP:= DMP
+SRC			= $(wildcard *.cpp)
+
+# 公共目录
+
+LOCAL_INC	:=/usr/local/include
+LOCAL_LIB	:=/usr/local/lib
+LOCAL_BIN	:=/usr/local/bin
+
+ifeq ($(MACDEVCOMPILE), TRUE)
+$(warning ----------MAC开发环境编译----------)
+BASEPATH := /Users/luoshaohua
+DMPCOMM	:= $(BASEPATH)/data/aiad/dmp
+PROTO_INC	:= $(LOCAL_INC)/google/protobuf
+
+BOOST_LIBDIR :=$(LOCAL_LIB)/boost
+BOOST_LIB 	:= -lboost_log_setup-mt -lboost_log-mt -lboost_filesystem-mt -lboost_system-mt -lboost_thread-mt
+
+PROMETHEUS_INC	:= $(LOCAL_INC)
+PROMETHEUS_LIBDIR := $(LOCAL_LIB)
+PROMETHEUS_LIB  := -lprometheus-cpp-core -lprometheus-cpp-pull -lprometheus-cpp-push
+else
+$(warning ----------云环境编译----------)
+DMPCOMM	:= /data/dmp
+PROTO_INC	:= $(DMPCOMM)/grpc/third_party/protobuf/src
+
+BOOST_LIBDIR :=$(LOCAL_LIB)/boost
+BOOST_LIB 	:= -lboost_log_setup -lboost_log -lboost_filesystem  -lboost_system -lboost_thread
+
+PROMETHEUS_INC	:= $(DMPCOMM)/prometheus-cpp/build/core/include/
+PROMETHEUS_LIBDIR := $(DMPCOMM)/prometheus-cpp/build/lib
+PROMETHEUS_LIB  := -lprometheus-cpp-core -lprometheus-cpp-pull -lprometheus-cpp-push
+endif
+
+EXPORT_INC  := $(DMPCOMM)/export-dev/export-dev-include
+EXPORT_LIBDIR  := $(DMPCOMM)/export-dev/export-dev-lib
+
+
+PROTO_LIB	:= $(LOCAL_LIB)/libprotobuf.a
+PROTOCBIN	:= $(LOCAL_BIN)/protoc
+GRPC_CXX_PLUGIN_PATH := $(LOCAL_BIN)/grpc_cpp_plugin
+
+HIREDIS_INC	:= $(LOCAL_INC)/hiredis
+
+SSL_INC         := /usr/local/ssl/include
+SSL_LIBDIR      := /usr/local/ssl/lib
+
+KAFKA_INC	:= $(LOCAL_INC)/librdkafka
+
+INCLUDE   += -I$(LOCAL_INC) -I$(EXPORT_INC) -I$(PROTO_INC) -I$(HIREDIS_INC) -I$(PROMETHEUS_INC) -I$(KAFKA_INC)
+LIB       += -lmyuuid -lmytafutil -lz -ldl -lgrpc -lgrpc++ -lgrpc++_reflection -lhiredis -lpthread -lcurl -lzookeeper_mt -lrdkafka -lrdkafka++ -ltcmalloc $(PROTO_LIB) $(BOOST_LIB) $(PROMETHEUS_LIB)
+LIB_DIR   +=  -L$(EXPORT_LIBDIR) -L$(LOCAL_LIB) -L$(BOOST_LIBDIR) -L$(PROMETHEUS_LIBDIR)
+
+# 0. 依据.proto生成pb头文件和源文件
+# 1. 修改.proto生成的cc文件为cpp文件
+# 2. 依据规则对所有.cpp 文件生成*.o文件
+# 3. 依据.o 文件和依赖库，链接成二进制文件
+
+$(shell $(PROTOCBIN) --cpp_out=. ./*.proto )
+$(shell $(PROTOCBIN) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CXX_PLUGIN_PATH) ./*.proto )
+ifeq ($(MACDEVCOMPILE), TRUE)
+$(shell rename 's/.cc/.cpp/g' *.cc)
+else
+$(shell rename cc cpp *.cc)
+endif
+
+OBJECTS=$(patsubst %.cpp,%.o,$(SRC))
+
+$(TARGET):$(OBJECTS)
+	$(CXX)  $^ -o $@ $(LIB_DIR) $(LIB)
+	
+$(OBJECTS):%.o:%.cpp
+	$(CXX) $(CFLAGS) $(INCLUDE) $< -o $@ 
+
+clean:
+	rm -rf *.o *.pb.cc *.pb.cpp *.pb.h $(TARGET)

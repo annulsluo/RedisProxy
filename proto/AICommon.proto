@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package AICommon;
+
+
+// 返回码
+enum AIReturnCode {
+	RET_SUCC                = 0;			// 成功
+	RET_FAIL				= -1;			// 失败
+	RET_NODATA              = -101;			// 无数据
+	RET_INVALID_PARAM       = -102;			// 参数错误
+	RET_AUTH_FAIL           = -103;			// 认证错误
+	RET_SYSTEM_ERROR        = -104;			// 其他系统错误
+	RET_REQUEST_EXCEEDED    = -105;			// 请求达到限制
+
+	// 错误相关
+	RET_GRPC_EXCEPTION       = -200;		// GRPC异常
+	RET_GRPC_TIMEOUT         = -201;		// GRPC超时
+	RET_GRPC_RSP_DATA_ERR    = -202;		// GRPC调用正常，结果异常
+}

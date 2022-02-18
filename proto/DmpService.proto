@@ -1,0 +1,175 @@
+
+syntax = "proto2";
+
+
+package dmp;
+
+service DmpKVServer {
+	rpc PipleLineOper(KVOperator) returns (KVResponse) {}
+}
+
+enum ERedisCmd
+{
+	REDIS_CMD_NONE			= 0;
+	REDIS_CMD_GET			= 100;
+	REDIS_CMD_SET			= 101;
+	REDIS_CMD_EXISTS		= 102;
+	REDIS_CMD_ZCOUNT		= 103;
+	REDIS_CMD_ZRANGEBYSCORE	= 104;
+	REDIS_CMD_EXPIRE		= 105;
+	REDIS_CMD_INCR			= 106;
+	REDIS_CMD_ZADD			= 107;
+	REDIS_CMD_ZREMRANGEBYSCORE	= 108;
+	REDIS_CMD_ZREMRANGEBYRANK	= 109;
+	REDIS_CMD_HGET			= 110;
+	REDIS_CMD_HMGET			= 111;
+	REDIS_CMD_HGETALL		= 112;
+	REDIS_CMD_HDEL			= 113;
+	REDIS_CMD_HSET			= 114;
+	REDIS_CMD_HMSET			= 115;
+	REDIS_CMD_HINCRBY		= 116;
+	REDIS_CMD_HINCRBYFLOAT	= 117;
+}
+
+// 请求Body中的字符类型
+enum ECharType
+{
+	CHARTYPE_NONE		= 0;
+	CHARTYPE_STRING		= 1;	// 表示字符串类型
+	CHARTYPE_BINARY		= 2;	// 表示二进制类型
+}
+
+enum ERequestElementType
+{
+	REQUESTELEMENTTYPE_NONE		= 0;
+	REQUESTELEMENTTYPE_CMD		= 1;
+	REQUESTELEMENTTYPE_KEY		= 2;
+	REQUESTELEMENTTYPE_VALUE	= 3;
+	REQUESTELEMENTTYPE_FIELD	= 4;				// 用于HashMap数据结构 中设置Field
+	REQUESTELEMENTTYPE_TIMEOUT	= 5;				// 用于SetEx命令 中设置超时
+	REQUESTELEMENTTYPE_MEMBER	= 6;				// 用于有序集合中 Member
+	REQUESTELEMENTTYPE_EX		= 7;				// 用于Set命令的过期时间--秒
+	REQUESTELEMENTTYPE_PX		= 8;				// 用于Set命令的过期时间--毫秒
+	REQUESTELEMENTTYPE_NX		= 9;				// 用于Set命令，只在键不存在时，才对键进行设置操作
+	REQUESTELEMENTTYPE_XX		= 10;				// 用于Set命令，只在键存在时，才对键进行设置操作
+	REQUESTELEMENTTYPE_SCORE    = 11;				// 用于有序集合中 SCORE
+	REQUESTELEMENTTYPE_START	= 12;				// 用于有序集合range查询的start，ZRANGEBYSCORE查询的min
+	REQUESTELEMENTTYPE_STOP		= 13;				// 用于有序集合Range查询的stop，ZRANGEBYSCORE查询的max
+	REQUESTELEMENTTYPE_OFFSET	= 14;				// 用于有序集合ZRANGEBYSCORE查询的 limit offset count
+	REQUESTELEMENTTYPE_COUNT	= 15;				// 用于有序集合ZRANGEBYSCORE查询的 limit offset count
+}
+
+message RequestElement
+{
+	optional	int32			nRequestElementType	= 1;		// ERequestElementType
+	optional	int32			nCharType			= 2;		// ECharType
+	optional	bytes			sRequestElement		= 3;		// 表示元素值
+}
+
+message RequestBody
+{
+	repeated RequestElement oRequestElementList	= 4;				// 以向量记录Cmd、Key、Value、Opt等字段
+}
+
+// 定义客户端请求的数据格式，去掉了RequestHead
+message KVOperator
+{
+	optional	 string sAppId					= 1;	// 申请账号ID，对应LMDB的 UserId
+	optional	 string sAppPw					= 2;	// 分配的密码。
+	optional	 string sAppName				= 3;	// 应用名，对应LMDB的DB name
+	optional	 string sTableName				= 4;	// 表名，对应LMDB的Table name
+	repeated	RequestBody oRequestBodyList	= 5;	// 请求的KeyList
+}
+
+
+enum EResultCode
+{
+	RESULT_SUCC                 = 0;		// 成功
+	RESULT_DATA_NOTFOUND		= 1;		// 数据没找到
+	RESULT_FAIL					= -1;		// 失败
+
+	// 客户端错误
+	RESULT_UNKNOWN_COMMAND      = -200;		// 未知命令
+	RESULT_UNKNOWN_VERSION		= -201;		// 未知版本
+
+	// 服务端错误
+	RESULT_SYSTEM_ERROR         = -300;		// 系统错误
+
+	// REDISERROR
+	RESULT_REDIS_IO_ERROR			= -101;		// redisIOerror
+	RESULT_REDIS_OTHER_ERROR		= -102;		// rediserroother
+	RESULT_REDIS_EOF_ERROR			= -103;		// rediserreof
+	RESULT_REDIS_PROTOCOL_ERROR		= -104;		// rediserrprotocol
+	RESULT_REDIS_OOM_ERROR			= -105;		// rediserroom
+	RESULT_REDIS_TIMEOUT_ERROR		= -106;		// rediserrtimeout
+	RESULT_REDIS_UNKNOWN_ERROR		= -199;		// rediserrunknow
+}
+
+enum EGlobalCode
+{
+	GLOBAL_SUCC					= 0;
+	GLOBAL_FAIL					= -1;
+	GLOBAL_INVALID_PARAM		= -2;		// 无效参数
+	GLOBAL_INVALID_USERPASSWD	= -3;		// 账号或密码无效
+	GLOBAL_INVALID_IP			= -4;		// 无效客户端IP
+	GLOBAL_QUOTAEXCEE			= -5;		// 超出流控阀值
+	GLOBAL_TOO_MANY_REQUESTS	= -6;		// 请求含有的body过多
+}
+
+// 定义返回的结果类型
+enum EResultType
+{
+	RESULTTYPE_NONE				= 0;
+	RESULTTYPE_STRING			= 1;				// 返回字符串
+	RESULTTYPE_INTEGER			= 2;				// 返回整数
+	RESULTTYPE_ARRAY			= 3;				// 返回数组
+	RESULTTYPE_FLOAT			= 4;				// 返回浮点数
+}
+
+// 定义返回数组的每个元素
+message ResultElement
+{
+	optional	 int32 nResultElementType = 1;		// ERequestElementType
+	optional	 int32	nResultType		= 2;	// 返回的类型 EResultType
+	optional	 bytes sResultElement	= 3;	// 返回结果值
+}
+
+// 定义每条返回结果的内容例如：key
+message ArrayResult
+{
+	optional	int32	nRet						= 1;	// 表示请求返回码 0：成功；<0失败
+	repeated	ResultElement oResultElementList	= 2;	// 以向量记录Cmd、Key、Value、Opt等字段
+}
+
+// 定义服务单条请求的响应结构
+message ResultBody
+{
+	optional	 int32	nRet						= 1;	// 表示请求返回码 参考EResultCode
+	optional	 bytes sValue						= 2;	// 表示返回来是String
+	optional	 int32  nResultType					= 3;	// EResultType
+	repeated	ArrayResult oArrayResultList		= 4;	// 表示返回来是ArrayResult: Array(SortSet/Hash/List)
+	optional	 int32	nVer						= 5;	// 表示返回来的版本号，跟请求时的版本号一致 EVersion
+}
+
+// 定义服务端响应的响应结构
+message KVResponse
+{
+	optional	 int32 nGret					= 1;		// 全局状态码 EGlobalCode
+	repeated	ResultBody oResultBodyList		= 2;		// 表示应答返回的结果，跟Request顺序一致
+}
+
+message FieldList
+{
+	repeated string sField		= 1;		// 表示一个key对应的多个Field
+}
+
+message MemberScore
+{
+	optional	string sMember		= 1;		//
+	optional	float fScore		= 2;		//
+}
+
+message SortedSetList
+{
+	repeated MemberScore oMemberScore		= 1;		//
+}

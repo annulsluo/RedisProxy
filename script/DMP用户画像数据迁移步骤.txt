@@ -1,0 +1,38 @@
+背景：DMP用户画像数据过大(800g/14亿)，没有足够内存做平滑迁移，故使用尽量不影响业务(业务侧停读写)下进行停机迁移
+时间节点：工作日不能停止，讨论后周六日可停止读写，暂定4月25日(本周六)
+操作步骤如下：
+1. 通知DSP侧关停宋用户画像数据读取 
+	1.1 关停 adx 访问旧集群：/Athena-AD/adx/stop/option {"inmobi":true,"tencent":true,"toutiao":true}
+2. 登陆到172.16.154.51，关闭10010～10014对应的crontab
+3. 开始checkpoint文件;
+	3.1 关闭 redis 实例： 执行 /data/projects/scripts/DmpRedisAofBack.sh stop;
+	3.2 进行实例AOF文件备份：执行 /data/projects/scripts/DmpRedisAofBack.sh backup；
+	3.3 检查实例AOF文件备份是否成功：执行 /data/projects/scripts/DmpRedisAofBack.sh checkbackup;
+	3.4 检查实例AOF旧文件是否都没有：执行 /data/projects/scripts/DmpRedisAofBack.sh checkrollback;
+	3.5 启动 redis 实例：执行 /data/projects/scripts/DmpRedisAofBack.sh start;
+	3.6 检查 redis 实例是否存在：执行 /data/projects/scripts/DmpRedisAofBack.sh checkredis;
+4. 重复执行另外9台机器(172.16.154.76
+172.16.154.75
+172.16.154.114
+172.16.154.70
+172.16.154.100
+172.16.154.107
+172.16.154.62
+172.16.154.91
+172.16.154.126) 1~2的步骤
+4. 开始导数据
+	4.1 通知 DMP 导数据工具开始消费9亿数据到 RedisProxy 中，预计3～5小时
+	4.2 检查实例AOF新文件是否生成：执行 /data/projects/scripts/DmpRedisAofBack.sh checkrollback;
+	4.3 集群压测理论写入速度15w/s, 预估9亿/15w约9200s，约时长3小时;后期观察和验证5小时
+5. 通知 DSP 启用用户画像数据读取，校验DMP中的数据读写正确性，若数据存在问题，则操作以下步骤5.1步骤；若正常则进行5.2
+	5.1 对10台机器还原aof文件到目录文件，并且对服务器进行重启
+		回滚aof文件：执行 /data/projects/scripts/DmpRedisAofBack.sh rollback;
+	5.1 启动DSP 读取用户画像：/Athena-AD/adx/redis/useRedisProxy all
+	5.2 启动 adx 访问用户画像：执行zk /Athena-AD/adx/stop/option {"inmobi":false,"tencent":false,"toutiao":false}
+	5.3 对运营情况进行观察(2~3天)
+
+相应负责人
+运维：帮忙执行迁移前和数据回退时的脚本操作 zczeng
+DSP开发：校验数据正确性，在测试环境验证业务数据 joegu
+DMP开发：切换数据导入到RedisProxy中，在测试环境中验证数据准确性 minglechen/vinsonhuang
+RedisProxy开发：准备checkpoint脚本，并在测试环境验证流程 annulsluo
