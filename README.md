@@ -35,7 +35,7 @@ RedisProxy 目前主要release版本如下:
 
 ### RedisProxy 整体架构
 
-![image]
+![image](https://github.com/annulsluo/RedisProxy/blob/master/photos/RedisProxyArchitecture1.png)
 
 RedisProxy 1.0 由以下组件组成：
 
