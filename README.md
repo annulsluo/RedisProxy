@@ -253,4 +253,4 @@ ok bodylist_size:50|pthreadid:139936684951296|totalreq:10|threadnum:1|pipelinenu
 * **consul**	-- 服务发现组件
 
 ## 6. 贡献者
-+ annulsluo@webank.com
++ annulsluo
