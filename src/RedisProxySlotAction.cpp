@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxySlotAction.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 二  6/30 16:49:54 2020
  ************************************************************************/
 #include "RedisProxySlotAction.h"

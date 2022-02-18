@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyPrometheus.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 日  3/ 1 20:55:04 2020
  ************************************************************************/
 #ifndef _RedisProxyPrometheus_H_

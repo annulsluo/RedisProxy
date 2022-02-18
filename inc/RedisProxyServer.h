@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyServer.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 日 11/10 16:40:43 2019
  ************************************************************************/
 

@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyCmd.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 11/11 09:58:54 2019
  ************************************************************************/
 #ifndef _RedisProxyCmd_H_

@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyGuard.cpp.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 四  4/23 10:48:14 2020
  ************************************************************************/
 

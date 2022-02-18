@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: test_promutheus.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 日  3/ 1 19:57:25 2020
  ************************************************************************/
 #include <chrono>

@@ -1,7 +1,7 @@
 #########################################################################
 # File Name: RedisMonitor.sh
 # Author: annulsluo
-# mail: annulsluo@webank.com
+# mail: annulsluo@gmail.com
 # Created Time: 一 12/16 22:24:36 2019
 #########################################################################
 #!/bin/bash

@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: DoProxyCmdTask.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 二 11/12 15:30:24 2019
  ************************************************************************/
 

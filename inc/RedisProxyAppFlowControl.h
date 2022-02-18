@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyAppFlowControl.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一  3/23 14:47:55 2020
  ************************************************************************/
 

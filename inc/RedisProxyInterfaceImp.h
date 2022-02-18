@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyInterfaceImp.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 四 11/ 7 15:09:43 2019
  ************************************************************************/
 #ifndef _RedisProxyInterfaceImp_H_

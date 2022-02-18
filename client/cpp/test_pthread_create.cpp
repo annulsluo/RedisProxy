@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: test_pthread_create.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 五 12/ 6 11:25:54 2019
  ************************************************************************/
 #include<stdio.h>

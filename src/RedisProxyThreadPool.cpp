@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyThreadPool.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 三  7/22 14:52:01 2020
  ************************************************************************/
 #include "ServerConfig.h"

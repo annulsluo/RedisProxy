@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyThreadPool.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 三  7/22 14:53:04 2020
  ************************************************************************/
 #ifndef _RedisProxyThreadPool_H_

@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyBackEnd.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 11/11 09:47:05 2019
  ************************************************************************/
 #ifndef _RedisProxyBackEnd_H_

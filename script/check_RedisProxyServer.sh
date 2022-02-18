@@ -1,7 +1,7 @@
 #########################################################################
 # File Name: check_RedisProxyServer.sh
 # Author: annulsluo
-# mail: annulsluo@webank.com
+# mail: annulsluo@gmail.com
 # Created Time: 二  1/14 16:35:10 2020
 #########################################################################
 #!/bin/bash

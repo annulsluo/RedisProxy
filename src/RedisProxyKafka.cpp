@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyKafka.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 六  4/ 4 18:39:00 2020
  ************************************************************************/
 #include "RedisProxyKafka.h"

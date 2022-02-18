@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: redisproxythreadclient_single.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 五  5/ 8 11:37:42 2020
  ************************************************************************/
 #include <iostream>

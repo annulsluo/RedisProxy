@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyZkData.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一  2/17 15:28:08 2020
  ************************************************************************/
 #ifndef _REDISPROXYZKDATA_H_

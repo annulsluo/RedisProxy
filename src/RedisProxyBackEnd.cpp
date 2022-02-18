@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyBackEnd.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 11/11 09:46:51 2019
  ************************************************************************/
 #include "RedisProxyBackEnd.h"

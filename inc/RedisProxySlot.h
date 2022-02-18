@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxySlot.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 11/11 07:57:33 2019
  ************************************************************************/
 #ifndef _RedisProxySlot_H_

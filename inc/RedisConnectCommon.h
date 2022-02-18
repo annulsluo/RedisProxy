@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisConnectCommon.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 二  3/24 10:41:58 2020
  ************************************************************************/
 #ifndef REDIS_CONNECT_COMMON_H

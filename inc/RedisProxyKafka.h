@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyKafka.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 六  4/ 4 18:38:52 2020
  ************************************************************************/
 #ifndef _RedisProxyKafka_H_

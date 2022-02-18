@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyRegister.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 12/30 10:25:19 2019
  ************************************************************************/
 #ifndef _RedisProxyRegister_H_

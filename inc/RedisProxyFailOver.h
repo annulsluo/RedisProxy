@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyFailOver.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 四  3/19 16:58:05 2020
  ************************************************************************/
 

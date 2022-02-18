@@ -35,7 +35,7 @@ RedisProxy 目前主要release版本如下:
 
 ### RedisProxy 整体架构
 
-![image](http://git.weoa.com/aiad-platform/cpp-server-proj/raw/master/RedisProxyServer/photos/RedisProxyArchitecture.png)
+![image]
 
 RedisProxy 1.0 由以下组件组成：
 
@@ -72,7 +72,7 @@ RedisProxy 1.0 由以下组件组成：
 
 ## 0. 编译
 
-### 部署[release binary](http://git.weoa.com/aiad-platform/cpp-server-proj/tree/master/RedisProxyServer)文件安装
+### 部署[release binary]文件安装
 仅支持 C++ 编译环境
 
 ### 编译源码安装
@@ -80,7 +80,7 @@ RedisProxy 1.0 由以下组件组成：
 #### 1. 部署 grpc 环境 [参考这里](https://github.com/grpc/grpc)
 #### 2. 部署 boost 环境 [参考这里](https://github.com/boostorg/boost)
 #### 3. 部署 hiredis 环境 [参考这里](https://github.com/redis/hiredis)
-#### 4. 部署 export-dev 环境 [参考这里](http://git.weoa.com/aiad-platform/cpp-server-proj/tree/master/export-dev)
+#### 4. 部署 export-dev 环境 [参考这里](http://git.待补充.com/aiad-platform/cpp-server-proj/tree/master/export-dev)
 
 #### 5. 部署编译环境
 
@@ -137,10 +137,10 @@ redis.conf 配置中 pidfile、logfile 默认保存在 `/tmp` 目录，若启动
 
 Deploy 文件夹包含了部署的 RedisProxyServer，根据自己部署环境修改 `RedisProxyServer.conf` 文件里参数，修改配置中的 svr_ip 和 svr_port 即可。
 
-Deploy 部署集群需安装 `consul agent`[参考这里](http://git.weoa.com/aiad-platform/service-discovery-and-rate-limit)，其余没有任何依赖的内容。
+Deploy 部署集群需安装 `consul agent`[参考这里](http://git.待补充.com/aiad-platform/service-discovery-and-rate-limit)，其余没有任何依赖的内容。
 
 ```
-git clone http://git.weoa.com/aiad-platform/cpp-server-proj/tree/master/RedisProxyServer/Deploy
+git clone http://git.待补充.com/aiad-platform/cpp-server-proj/tree/master/RedisProxyServer/Deploy
 $ cd ./Deploy
 ```
 

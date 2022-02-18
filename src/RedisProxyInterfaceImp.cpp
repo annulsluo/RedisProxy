@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyInterfaceImp.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 四 11/ 7 15:09:32 2019
  ************************************************************************/
 // Logic and data behind the server's behavior

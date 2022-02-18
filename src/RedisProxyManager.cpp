@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyManager.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 四 11/ 7 15:07:35 2019
  ************************************************************************/
 

@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: HandleSlotMigrateTask.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 二  6/30 16:58:50 2020
  ************************************************************************/
 #ifndef _HANDLESLOTMIGRATETASK_H_

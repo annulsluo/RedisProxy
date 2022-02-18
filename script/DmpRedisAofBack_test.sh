@@ -1,7 +1,7 @@
 #########################################################################
 # File Name: DmpRedisAofBack.sh
 # Author: annulsluo
-# mail: annulsluo@webank.com
+# mail: annulsluo@gmail.com
 # Created Time: 四  4/23 15:13:42 2020
 #########################################################################
 #!/bin/bash

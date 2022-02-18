@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxySlotAction.h
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 日  6/28 19:09:44 2020
  ************************************************************************/
 

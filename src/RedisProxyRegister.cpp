@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyRegister.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一 12/30 14:20:44 2019
  ************************************************************************/
 #include "RedisProxyRegister.h"

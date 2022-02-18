@@ -1,7 +1,7 @@
 #########################################################################
 # File Name: RedisProxyServer.sh
 # Author: annulsluo
-# mail: annulsluo@webank.com
+# mail: annulsluo@gmail.com
 # Created Time: 一 12/ 2 10:09:29 2019
 #########################################################################
 

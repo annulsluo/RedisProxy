@@ -1,7 +1,7 @@
 /*************************************************************************
     > File Name: RedisProxyZkData.cpp
     > Author: annulsluo
-    > Mail: annulsluo@webank.com
+    > Mail: annulsluo@gmail.com
     > Created Time: 一  2/17 15:27:58 2020
  ************************************************************************/
 #include "RedisProxyZkData.h"

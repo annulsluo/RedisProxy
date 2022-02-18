@@ -1,7 +1,7 @@
 #########################################################################
 # File Name: RedisScan.sh
 # Author: annulsluo
-# mail: annulsluo@webank.com
+# mail: annulsluo@gmail.com
 # Created Time: 二 12/17 21:37:52 2019
 #########################################################################
 #!/bin/bash
